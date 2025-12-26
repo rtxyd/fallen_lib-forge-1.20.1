@@ -1,4 +1,7 @@
 Changelog
+1.1
+====
+- 1.1.0 Reimplemented fallen patch as a configurable api.
 1.0
 ====
 - 1.0.2 Aligned mod id and mod main class.
