@@ -3,6 +3,7 @@
 ## 1.1
 ---
 ### 1.1.1
+- Fixed sorting.
 - Added an empty check before traversing classes.
 - Filtered `minecraft` and `forge` class targets for now.
 ### 1.1.0
