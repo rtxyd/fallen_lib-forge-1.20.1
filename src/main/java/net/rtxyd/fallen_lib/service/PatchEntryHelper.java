@@ -92,7 +92,7 @@ class PatchEntryHelper {
         } else {
             List<String> exact = tarData.getWithDefaut("exact", List.of());
             List<String> subclass = tarData.getWithDefaut("subclass", List.of());
-            targets = FallenPatchEntry.Targets.from(exact, subclass);
+            targets = new FallenPatchEntry.Targets().from(exact, subclass);
         }
         return buildEntry(path, pr, targets);
     }

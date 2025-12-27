@@ -35,6 +35,10 @@ public final class FallenPatchEntry {
         return priority;
     }
 
+    public boolean isEmpty() {
+        return targeter == 0;
+    }
+
     public boolean matches(String targetClass, ClassIndex classIndex) {
         if (disabled) {
             return false;
@@ -107,11 +111,23 @@ public final class FallenPatchEntry {
         Set<String> exact = Set.of();
         Set<String> subclass = Set.of();
 
-        public static Targets from(List<String> exact, List<String> subclass) {
-            Targets targets1 = new Targets();
-            targets1.exact = exact.stream().map(s->s.replace(".", "/")).collect(Collectors.toUnmodifiableSet());
-            targets1.subclass = subclass.stream().map(s->s.replace(".", "/")).collect(Collectors.toUnmodifiableSet());
-            return targets1;
+        public Targets from(List<String> exact, List<String> subclass) {
+            if (checkTargets(exact) && checkTargets(subclass)) {
+                return this;
+            }
+            this.exact = exact.stream().map(s->s.replace(".", "/")).collect(Collectors.toUnmodifiableSet());
+            this.subclass = subclass.stream().map(s->s.replace(".", "/")).collect(Collectors.toUnmodifiableSet());
+            return this;
+        }
+
+        public static boolean checkTargets(List<String> targets) {
+            for (String s : targets) {
+                if (s.startsWith("net.minecraft.")
+                        || s.startsWith("net.minecraftforge.")) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public int computeTargeter() {
