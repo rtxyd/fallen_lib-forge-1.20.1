@@ -95,7 +95,7 @@ class PatchEntryHelper {
             List<String> exact = tarData.getWithDefaut("exact", List.of());
             List<String> subclass = tarData.getWithDefaut("subclass", List.of());
             if (containsForbidden(exact) || containsForbidden(subclass)) {
-                FallenBootstrap.LOGGER.warn("Warning: {} targets mc or forge class, it is not supported for now.", className);
+                FallenBootstrap.LOGGER.warn("Warning: {} targets mc or forge class, it is not supported for now. May support in the future.", className);
             } else {
                 targets = new FallenPatchEntry.Targets().from(exact, subclass);
             }

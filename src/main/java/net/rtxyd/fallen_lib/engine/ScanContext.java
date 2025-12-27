@@ -20,21 +20,21 @@ public class ScanContext implements IScanContext {
     public List<FallenPatchEntry> patchEntries() {
         if (sortedPatchEntries == null) {
             internalPatchEntries.sort(Comparator.comparingInt(FallenPatchEntry::getPriority));
-            sortedPatchEntries = List.copyOf(internalPatchEntries);
+            sortedPatchEntries = Collections.unmodifiableList(internalPatchEntries);
         }
         return sortedPatchEntries;
     }
 
     public Map<FallenConfig, ResourceContainer> configContainers() {
         if (configContainers == null) {
-            configContainers = Map.copyOf(internalConfigContainers);
+            configContainers = Collections.unmodifiableMap(internalConfigContainers);
         }
         return configContainers;
     }
 
     public Map<String, byte[]> getClassBytesView() {
         if (classBytesView == null) {
-            classBytesView = Map.copyOf(internalClassBytes);
+            classBytesView = Collections.unmodifiableMap(internalClassBytes);
         }
         return classBytesView;
     }

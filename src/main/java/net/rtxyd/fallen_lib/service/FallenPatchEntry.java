@@ -35,27 +35,55 @@ public final class FallenPatchEntry {
         return priority;
     }
 
+    /**
+     *
+     * @return Collected targets number.
+     */
+    public int getTargetsNumber() {
+        return targets.targetsNumber();
+    }
+
+    /**
+     * Check if there's no targets.
+     * @return whether it has any target.
+     */
     public boolean isEmpty() {
         return targeter == 0;
     }
 
+    /**
+     *
+     * @param targetClass The potential targeted class of this entry.
+     * @param classIndex Collected classes.
+     * @return whether it matches the filtered conditions.
+     */
     public boolean matches(String targetClass, ClassIndex classIndex) {
         if (disabled) {
             return false;
         }
 
         if ((targeter & Targeter.EXACT_TARGETER) != 0) {
-            if (targets.exact.contains(targetClass)) return true;
+            if (targets.exact.contains(targetClass)) {
+                return true;
+            }
         }
 
-        if ((targeter & Targeter.SUBCLASS_TARGETER) != 0) {
-            return classIndex.isSubclassOf(targetClass, targets.subclass);
+        if ((targeter & Targeter.SUBCLASS_TARGETER) != 0 && classIndex.isSubclassOf(targetClass, targets.subclass)) {
+            targets.bySubNumber += 1;
+            return true;
         }
 
         return false;
     }
 
-    IFallenPatch getOrCreateInstance(BytecodeClassLoader loader, byte[] classBytes, IFallenPatchCtorContext ctx) {
+    /**
+     *
+     * @param loader {@link BytecodeClassLoader} to define the patch class.
+     * @param classBytes The byte array cached from scanner engine.
+     * @param ctx Patch constructor context
+     * @return A {@link IFallenPatch} instance or {@code null}
+     */
+    IFallenPatch getOrCreateInstance(BytecodeClassLoader loader, byte[] classBytes, DefaultPatchCtorContext ctx) {
         if (disabled || classBytes == null) return null;
         if (instance != null) return instance;
         try {
@@ -63,6 +91,8 @@ public final class FallenPatchEntry {
 
             try {
                 Constructor<?> ctor = c.getDeclaredConstructor(IFallenPatchCtorContext.class);
+                // make sure it gives a basic info before constructing.
+                ctx.setCurrent(new DefaultPatchDescriptor(className, getTargetsNumber()));
                 instance = (IFallenPatch) ctor.newInstance(ctx);
             } catch (NoSuchMethodException e) {
                 // fallback
@@ -77,6 +107,12 @@ public final class FallenPatchEntry {
         }
     }
 
+    /**
+     * Early way to create instance, not used.
+     * @param loader {@link ClassLoader} to load the class.
+     * @param ctx Patch constructor context
+     * @return A {@link IFallenPatch} instance or {@code null}
+     */
     IFallenPatch getOrCreateInstance(ClassLoader loader, IFallenPatchCtorContext ctx) {
         if (disabled) return null;
         if (instance != null) return instance;
@@ -110,9 +146,12 @@ public final class FallenPatchEntry {
     public static class Targets {
         Set<String> exact = Set.of();
         Set<String> subclass = Set.of();
+        int byExaNumber = 0;
+        int bySubNumber = 0;
 
         public Targets from(List<String> exact, List<String> subclass) {
             this.exact = exact.stream().map(s->s.replace(".", "/")).collect(Collectors.toUnmodifiableSet());
+            this.byExaNumber = this.exact.size();
             this.subclass = subclass.stream().map(s->s.replace(".", "/")).collect(Collectors.toUnmodifiableSet());
             return this;
         }
@@ -126,6 +165,10 @@ public final class FallenPatchEntry {
                 targeter |= Targeter.SUBCLASS_TARGETER;
             }
             return targeter;
+        }
+
+        public int targetsNumber() {
+            return byExaNumber + bySubNumber;
         }
     }
 }

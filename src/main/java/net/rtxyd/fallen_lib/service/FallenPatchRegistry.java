@@ -28,7 +28,7 @@ public class FallenPatchRegistry implements IFallenRegistry<FallenPatchEntry> {
 
     public Set<String> targets() {
         if (targets == null) {
-            targets = Set.copyOf(targetEntries.keySet());
+            targets = Collections.unmodifiableSet(targetEntries.keySet());
         }
         return targets;
     }

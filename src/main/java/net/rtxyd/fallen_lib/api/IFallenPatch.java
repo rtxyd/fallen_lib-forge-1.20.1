@@ -9,6 +9,7 @@ import org.objectweb.asm.tree.ClassNode;
  * Do only ASM operations in your implementations.
  * Do not define any static fields and use static block.
  * Do not reference in constructor with any {@link net.minecraft}, {@link net.minecraftforge}
+ * Do not reference any target class.
  * Do not trigger any active class loading.
  * Do not create extra thread in your implementations.
  */

@@ -15,6 +15,6 @@ public final class ClassInfo {
     }
 
     public List<String> getNestMembers() {
-        return List.copyOf(nestMembers);
+        return Collections.unmodifiableList(nestMembers);
     }
 }

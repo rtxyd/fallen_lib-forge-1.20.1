@@ -14,7 +14,7 @@ import java.util.Set;
 public final class FallenBootstrap implements ITransformationService {
     boolean initialized;
     private final FallenPatchRegistry registry = new FallenPatchRegistry();
-    static final Logger LOGGER = LoggerFactory.getLogger("fallen");
+    static final Logger LOGGER = LoggerFactory.getLogger("fallen.bootstrap");
     @Override
     public String name() {
         return "fallen";
@@ -47,6 +47,6 @@ public final class FallenBootstrap implements ITransformationService {
     @Override
     public List<ITransformer> transformers() {
         LOGGER.info("Creating delegating transformer.");
-        return List.of(new FallenDelegatingTransformer(registry, new IFallenPatchCtorContext() {}));
+        return List.of(new FallenDelegatingTransformer(registry, new DefaultPatchCtorContext(registry.classBytes.keySet())));
     }
 }
