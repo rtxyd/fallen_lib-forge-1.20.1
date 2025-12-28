@@ -98,6 +98,11 @@ public class InitializeHelper {
             for (String className : allClasses) {
                 if (e.matches(className, index)) {
                     registry.register(className, e);
+                    if (e.isIncludeNestMembers()) {
+                        for (String nm : index.getNestMembers(className)) {
+                            registry.register(nm, e);
+                        }
+                    }
                 }
             }
         }

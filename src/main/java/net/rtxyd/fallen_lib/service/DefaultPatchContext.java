@@ -17,7 +17,7 @@ public class DefaultPatchContext implements IFallenPatchContext {
     }
 
     @Override
-    public Set<String> getAppliedPatches() {
+    public Set<String> currentClassAppliedPatches() {
         return appliedByClassView;
     }
 

@@ -16,6 +16,7 @@ public final class FallenPatchEntry {
     private final int targeter;
     private final int priority;
     private final Targets targets;
+    private final boolean includeNestMembers = true;
 
     private IFallenPatch instance;
     private boolean disabled;
@@ -49,6 +50,10 @@ public final class FallenPatchEntry {
      */
     public boolean isEmpty() {
         return targeter == 0;
+    }
+
+    public boolean isIncludeNestMembers() {
+        return includeNestMembers;
     }
 
     /**

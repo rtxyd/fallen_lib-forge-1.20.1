@@ -4,6 +4,7 @@ import cpw.mods.modlauncher.api.ITransformer;
 import cpw.mods.modlauncher.api.ITransformerVotingContext;
 import cpw.mods.modlauncher.api.TransformerVoteResult;
 import net.rtxyd.fallen_lib.api.IFallenPatch;
+import net.rtxyd.fallen_lib.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -45,7 +46,8 @@ public final class FallenDelegatingTransformer implements ITransformer<ClassNode
                 patchContext.recordPatchEffect(e.getClassName());
                 FallenBootstrap.LOGGER.info("Fallen patch [{}] successfully applied on [{}]", e.getClassName(), cn.name);
             } catch (Throwable ex) {
-                FallenBootstrap.LOGGER.error("Fallen patch [{}] failed on [{}].\n If it's *Reentrant Exception*, please check if your fallen patch references any target class.", e.getClassName(), cn.name, ex);
+                FallenBootstrap.LOGGER.error("Fallen patch [{}] failed on [{}].\n" +
+                        "If it's *Reentrant Exception*, please check if your fallen patch references any target class.", e.getClassName(), cn.name, ex);
                 e.disable();
                 cn = fallback;
             }

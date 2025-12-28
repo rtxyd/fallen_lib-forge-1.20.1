@@ -26,16 +26,11 @@ public class JarScanner implements ResourceScanner {
             while (entries.hasMoreElements()) {
                 JarEntry entry = entries.nextElement();
                 if (entry.isDirectory()) continue;
-
-                try {
-                    consumer.accept(new JarResource(container, jar, entry));
-                } catch (Exception e) {
-                    ResourceScanEngine.LOGGER.warn("Warning: error processing JarEntry : {}", entry.getName());
-                    e.printStackTrace();
-                }
+                // to prevent spamming, here is no try-catch
+                consumer.accept(new JarResource(container, jar, entry));
             }
         } catch (IOException e) {
-            ResourceScanEngine.LOGGER.warn("Warning: can't open: {}", jarFile.getAbsolutePath());
+            ResourceScanEngine.LOGGER.warn("Warning: can't open: [{}]", jarFile.getAbsolutePath());
         }
     }
 }

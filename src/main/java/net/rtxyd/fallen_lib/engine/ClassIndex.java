@@ -41,4 +41,12 @@ public class ClassIndex {
     ClassInfo get(String className) {
         return classHierarchy.get(className);
     }
+
+    public List<String> getNestMembers(String className) {
+        ClassInfo info = classHierarchy.get(className);
+        if (info != null) {
+            return Collections.unmodifiableList(info.nestMembers);
+        }
+        return List.of();
+    }
 }

@@ -33,7 +33,7 @@ public final class FallenBootstrap implements ITransformationService {
         try {
             helper.scanResources();
         } catch (IOException e) {
-            LOGGER.error("Unexpected: Error on ResourceScanEngine!");
+            LOGGER.debug("Unexpected: Error on ResourceScanEngine!");
             return;
         }
 

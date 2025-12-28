@@ -2,6 +2,7 @@ package net.rtxyd.fallen_lib.service;
 
 import net.rtxyd.fallen_lib.config.FallenConfig;
 import net.rtxyd.fallen_lib.type.engine.ResourceContainer;
+import net.rtxyd.fallen_lib.type.service.IClassBytesProvider;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -21,42 +22,59 @@ class PatchEntryHelper {
     private final IPatchSecurityHelper securityHelper = new PatchSecurityHelperV2();
 
     // out parameters must not be null
-    public void buildPatchEntries(FallenConfig cfg, ResourceContainer rc, List<FallenPatchEntry> outEntries, Map<String, byte[]> outRestoredBytes) {
+    public void buildPatchEntries(FallenConfig cfg, ResourceContainer rc, List<FallenPatchEntry> outEntries, Map<String, byte[]> outStoredBytes) {
         Optional<File> contOpt = rc.asFile();
         if (contOpt.isEmpty()) {
              return;
         }
         File cont = contOpt.get();
+        // in development environment.
         if (cont.isDirectory()) {
-            buildInner(outEntries, outRestoredBytes, cfg, cont, (f, zn) -> {
-                InputStream is = getClass().getClassLoader().getResourceAsStream(zn);
-                if (is == null) {
-                    return Optional.ofNullable(ClassLoader.getSystemClassLoader().getResourceAsStream(zn));
+            buildInner(outEntries, outStoredBytes, cfg, cont, (f, zn) -> {
+                try (InputStream isA = getClass().getClassLoader().getResourceAsStream(zn)) {
+                    if (isA != null) {
+                        return isA.readAllBytes();
+                    }
+                    try (InputStream isB = ClassLoader.getSystemClassLoader().getResourceAsStream(zn)) {
+                        if (isB != null) {
+                            return isB.readAllBytes();
+                        }
+                    }
+                    return null;
+                } catch (IOException e) {
+                    FallenBootstrap.LOGGER.debug("Failed parsing [{}] in folder [{}]", zn, f.getName(), e);
+                    return null;
                 }
-                return Optional.of(is);
             });
             return;
         }
 
-        buildInner(outEntries, outRestoredBytes, cfg, cont, (jar, zn) -> {
-            try (JarFile jarFile = new JarFile(jar)){
+        buildInner(outEntries, outStoredBytes, cfg, cont, (jar, zn) -> {
+            try (JarFile jarFile = new JarFile(jar)) {
                 JarEntry jarEntry = jarFile.getJarEntry(zn);
-                return Optional.ofNullable(jarFile.getInputStream(jarEntry));
+                if (jarEntry == null) {
+                    FallenBootstrap.LOGGER.warn("Warning: class file [{}] not found in [{}]", zn, jar.getName());
+                    return null;
+                }
+                try (InputStream is = jarFile.getInputStream(jarEntry)) {
+                    return is.readAllBytes();
+                }
             } catch (IOException e) {
-                FallenBootstrap.LOGGER.error("Failed parsing jarFile {}: {}", jar.getName(), e.getMessage());
-                return Optional.empty();
+                FallenBootstrap.LOGGER.debug("Failed parsing [{}] in jarFile [{}]",zn, jar.getName(), e);
+                return null;
             }
         });
     }
 
-    private void buildInner(List<FallenPatchEntry> entries, Map<String, byte[]> restoredBytes, FallenConfig cfg, File cont, BiFunction<File, String, Optional<InputStream>> isFunction) {
+    private void buildInner(List<FallenPatchEntry> entries, Map<String, byte[]> restoredBytes, FallenConfig cfg, File cont, IClassBytesProvider bytesFunction) {
         int counter = 0;
-        String zn = "";
         for (String className : cfg.buildClassNames()) {
-            zn = className.replace(".", "/") + ".class";
-            String finalZn = zn;
-            try (InputStream is = isFunction.apply(cont, zn).orElseThrow(() -> new IOException("Resource not found: " + finalZn))) {
-                byte[] inputBytes = is.readAllBytes();
+            String zn = className.replace(".", "/") + ".class";
+            try {
+                byte[] inputBytes = bytesFunction.getClassBytes(cont, zn);
+                if (inputBytes == null) {
+                    continue;
+                }
                 ClassNode cn = new ClassNode();
                 new ClassReader(inputBytes).accept(cn, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
 
@@ -72,12 +90,12 @@ class PatchEntryHelper {
                     restoredBytes.put(className, inputBytes);
                     counter += 1;
                 }
-            } catch (IOException e) {
-                FallenBootstrap.LOGGER.error("Failed parsing fallen patch class {} : {}", zn, e.getMessage());
+            } catch (Exception e) {
+                FallenBootstrap.LOGGER.debug("Failed parsing fallen patch class {}", zn, e);
             }
         }
         if (counter == 0) {
-            FallenBootstrap.LOGGER.warn("Empty entries: package: {}, class: {}", cfg.getPackage(), zn);
+            FallenBootstrap.LOGGER.warn("Empty entries: package: {}", cfg.getPackage());
         }
     }
 
@@ -97,7 +115,8 @@ class PatchEntryHelper {
             List<String> exact = tarData.getWithDefaut("exact", List.of());
             List<String> subclass = tarData.getWithDefaut("subclass", List.of());
             if (containsForbidden(exact) || containsForbidden(subclass)) {
-                FallenBootstrap.LOGGER.warn("Warning: {} targets mc or forge class, it is not supported for now. May support in the future.", className);
+                FallenBootstrap.LOGGER.warn("Warning: {} targets mc or forge class, " +
+                        "it is not supported for now. May support in the future.", className);
             } else {
                 targets = new FallenPatchEntry.Targets().from(exact, subclass);
             }

@@ -7,6 +7,8 @@ import org.objectweb.asm.ClassReader;
 import java.io.InputStream;
 
 class ClassResourceProcessor implements ResourceProcessor {
+    // flag to provide spamming in log if exception.
+    private boolean loggerFlag = true;
 
     @Override
     public boolean supports(Resource r) {
@@ -20,7 +22,11 @@ class ClassResourceProcessor implements ResourceProcessor {
             new ClassReader(is).accept(cv, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
             ctx.classIndex.add(r.path().replace(".class", ""), new ClassInfo(cv.superName, cv.interfaces, cv.nestMembers));
         } catch (Exception e) {
-            ResourceScanEngine.LOGGER.warn("Failed processing class file: {}", r.path());
+            if (loggerFlag) {
+                ResourceScanEngine.LOGGER.warn("Errors occurred during Fallen patch scanning, see trace for details");
+            }
+            loggerFlag = false;
+            ResourceScanEngine.LOGGER.trace("Class {} failed to scan", r.path(), e);
         }
     }
 }

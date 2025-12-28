@@ -3,6 +3,9 @@
 ## 1.1
 ---
 ### 1.1.2
+- Fixed entry targets don't include nest members.
+- Improved logger behaviors, prevent spamming in log.
+- API change, `IFallenPatchContext#getAppliedPatches` -> `IFallenPatchContext#currentClassAppliedPatches`
 - Fixed a null point exception when resource is not found.
 ### 1.1.1
 - Added debug infos in patch processing procedure.
