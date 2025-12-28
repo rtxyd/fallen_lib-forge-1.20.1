@@ -2,8 +2,6 @@
 
 ## 1.1
 ---
-### 1.1.3
-- API change, `IFallenPatch#apply` now needs a boolean return value.
 ### 1.1.2
 - Fixed entry targets don't include nest members.
 - Improved logger behaviors, prevent spamming in log.

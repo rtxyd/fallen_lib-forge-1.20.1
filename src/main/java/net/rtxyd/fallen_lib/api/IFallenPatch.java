@@ -18,5 +18,5 @@ public interface IFallenPatch {
     static FallenPatch defaultAnnotation() {
         return IFallenPatch.class.getAnnotation(FallenPatch.class);
     }
-    boolean apply(ClassNode node, IFallenPatchContext ctx);
+    void apply(ClassNode node, IFallenPatchContext ctx);
 }
