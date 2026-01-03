@@ -2,6 +2,10 @@
 
 ## 1.1
 ---
+### 1.2.0
+- Package structure change, `fallen_lib` -> `fallen.lib`
+- Introduce standard method inserter.
+- Introduce patch util.
 ### 1.1.2
 - Fixed entry targets don't include nest members.
 - Improved logger behaviors, prevent spamming in log.

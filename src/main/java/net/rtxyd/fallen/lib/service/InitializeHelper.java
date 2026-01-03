@@ -2,7 +2,6 @@ package net.rtxyd.fallen.lib.service;
 
 import cpw.mods.modlauncher.api.IEnvironment;
 import net.rtxyd.fallen.lib.engine.*;
-import net.rtxyd.fallen_lib.engine.*;
 import net.rtxyd.fallen.lib.type.engine.ResourceScanner;
 
 import java.io.File;
@@ -89,7 +88,7 @@ public class InitializeHelper {
             new PatchEntryHelper().buildPatchEntries(config, container, entries, registry.classBytes);
         }));
         FallenBootstrap.LOGGER.info("Prepare to sort fallen patches.");
-        entries.sort(Comparator.comparingInt(FallenPatchEntry::getPriority));
+        entries.sort(Comparator.comparingInt(FallenPatchEntry::getPriority).reversed());
         FallenBootstrap.LOGGER.info("Sorted {} patch entries.", entries.size());
         for (FallenPatchEntry e : entries) {
             if (e.isEmpty()) {

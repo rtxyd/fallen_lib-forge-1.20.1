@@ -170,7 +170,7 @@ tasks.register("generateBuildInfo") {
     outputs.dir(outputDir)
 
     doLast {
-        def pkg = "net.rtxyd.fallen_lib.config"
+        def pkg = "net.rtxyd.fallen.lib.config"
         def dir = new File(outputDir, pkg.replace('.', '/'))
         dir.mkdirs()
 

@@ -4,9 +4,11 @@ import net.rtxyd.fallen.lib.api.IFallenPatch;
 import net.rtxyd.fallen.lib.config.Targeter;
 import net.rtxyd.fallen.lib.engine.ClassIndex;
 import net.rtxyd.fallen.lib.type.service.IFallenPatchCtorContext;
+import org.objectweb.asm.tree.MethodInsnNode;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -16,16 +18,18 @@ public final class FallenPatchEntry {
     private final int targeter;
     private final int priority;
     private final Targets targets;
+    private final Map<String, MethodInsnNode> inserters;
     private final boolean includeNestMembers = true;
 
     private IFallenPatch instance;
     private boolean disabled;
 
-    public FallenPatchEntry(String className, int targeter, int priority, Targets targets) {
+    public FallenPatchEntry(String className, int targeter, int priority, Targets targets, Map<String, MethodInsnNode> inserters) {
         this.className = className;
         this.targeter = targeter;
         this.priority = priority;
         this.targets = targets;
+        this.inserters = inserters;
     }
 
     public String getClassName() {
@@ -146,6 +150,10 @@ public final class FallenPatchEntry {
 
     public boolean isDisabled() {
         return disabled;
+    }
+
+    public Map<String, MethodInsnNode> getInserter() {
+        return inserters;
     }
 
     public static class Targets {

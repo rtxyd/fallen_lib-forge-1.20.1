@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
+@Retention(RetentionPolicy.CLASS)
 public @interface FallenPatch {
     /**
      * Determine the sequence when applying.
@@ -17,4 +17,9 @@ public @interface FallenPatch {
      * Determine the target classes.
      */
     Targets targets() default @Targets;
+
+    /**
+     * Determine the classes that will be scanned for {@link FallenInserter} methods.
+     */
+    Class<?>[] inserters() default {};
 }

@@ -9,6 +9,7 @@ class PatchSecurityHelperV2 implements IPatchSecurityHelper {
         for (MethodNode mn : cn.methods) {
             if (mn.name.equals("<clinit>") || mn.name.equals("<init>")) {
                 if (!isMethodSafe(mn)) {
+                    FallenBootstrap.LOGGER.debug("Warning: `{}.{}` contains unsafe instruction, skip.", cn.name, mn.name);
                     return false;
                 }
             }
@@ -42,24 +43,30 @@ class PatchSecurityHelperV2 implements IPatchSecurityHelper {
 
     boolean isForbiddenCall(MethodInsnNode mi) {
         String owner = mi.owner;
+        boolean result = false;
 
         if (owner.equals("java/lang/Class") && mi.name.equals("forName")) {
-            return true;
+            result = true;
         }
 
         if (owner.equals("java/lang/Thread") && mi.name.equals("start")) {
-            return true;
+
+            result = true;
         }
 
         if (owner.equals("java/lang/ClassLoader")) {
-            return true;
+            result = true;
         }
 
         if (owner.startsWith("net/minecraft/")
                 || owner.startsWith("net/minecraftforge/")) {
-            return true;
+            result = true;
         }
 
-        return false;
+        if (result) {
+            FallenBootstrap.LOGGER.debug("Warning: `{}.{} is not allowed in constructor, skip", owner, mi.name);
+        }
+
+        return result;
     }
 }

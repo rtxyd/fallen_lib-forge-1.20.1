@@ -15,6 +15,8 @@ import org.objectweb.asm.tree.ClassNode;
  */
 @FallenPatch
 public interface IFallenPatch {
+    static String fallenPatchInternalName() {return "Lnet/rtxyd/fallen/lib/api/annotation/FallenPatch;";}
+    static String fallenInserterInternalName() {return "Lnet/rtxyd/fallen/lib/api/annotation/FallenInserter;";}
     static FallenPatch defaultAnnotation() {
         return IFallenPatch.class.getAnnotation(FallenPatch.class);
     }
