@@ -1,11 +1,18 @@
 # Changelog
 
-## 1.1
+## 1.2
 ---
 ### 1.2.0
+- Introduce an each-class cache to cache the `MethodInsnNode` state, avoiding recalculation of local variables.
+- Update `ObjectModifierFactory`, make the ignored field filter a `Predicate<String>` to support more flexible control.
+- Add `inserter` field to `@FallenPatch` define the class contains methods with `@FallenInserter`
+- Introduce `FallenInserter` annotation and parsing.
 - Package structure change, `fallen_lib` -> `fallen.lib`
 - Introduce standard method inserter.
 - Introduce patch util.
+
+## 1.1
+---
 ### 1.1.2
 - Fixed entry targets don't include nest members.
 - Improved logger behaviors, prevent spamming in log.
